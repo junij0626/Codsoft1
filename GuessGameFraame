@@ -1,0 +1,107 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+
+public class GuessingGameFrame extends JFrame {
+    private int randomNumber;
+    private int attempts;
+    private int score;
+    private final int maxAttempts = 10;
+
+    private JTextField guessField;
+    private JLabel resultLabel;
+    private JLabel attemptsLabel;
+    private JLabel scoreLabel;
+
+    public GuessingGameFrame() {
+        setTitle("Number Guessing Game");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new GridLayout(6, 1));
+
+        // Initialize components
+        JLabel instructionLabel = new JLabel("Guess a number between 1 and 100:");
+        guessField = new JTextField();
+        JButton guessButton = new JButton("Guess");
+        resultLabel = new JLabel(" ");
+        attemptsLabel = new JLabel("Attempts left: " + maxAttempts);
+        scoreLabel = new JLabel("Score: 0");
+
+        add(instructionLabel);
+        add(guessField);
+        add(guessButton);
+        add(resultLabel);
+        add(attemptsLabel);
+        add(scoreLabel);
+
+        // Start a new game
+        startNewGame();
+
+        // Add action listener to the guess button
+        guessButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                processGuess();
+            }
+        });
+
+        setVisible(true);
+    }
+
+    private void startNewGame() {
+        Random rand = new Random();
+        randomNumber = rand.nextInt(100) + 1;
+        attempts = maxAttempts;
+        resultLabel.setText(" ");
+        attemptsLabel.setText("Attempts left: " + attempts);
+        guessField.setText("");
+        guessField.requestFocus();
+    }
+
+    private void processGuess() {
+        try {
+            int guess = Integer.parseInt(guessField.getText());
+
+            if (guess < 1 || guess > 100) {
+                resultLabel.setText("Please enter a number between 1 and 100.");
+                return;
+            }
+
+            attempts--;
+
+            if (guess < randomNumber) {
+                resultLabel.setText("Too low!");
+            } else if (guess > randomNumber) {
+                resultLabel.setText("Too high!");
+            } else {
+                resultLabel.setText("Correct! You've guessed the number!");
+                score += 1;
+                scoreLabel.setText("Score: " + score);
+                int response = JOptionPane.showConfirmDialog(this, "Play again?", "Congratulations!", JOptionPane.YES_NO_OPTION);
+                if (response == JOptionPane.YES_OPTION) {
+                    startNewGame();
+                } else {
+                    System.exit(0);
+                }
+            }
+
+            if (attempts == 0) {
+                resultLabel.setText("No more attempts! The number was: " + randomNumber);
+                int response = JOptionPane.showConfirmDialog(this, "Play again?", "Game Over", JOptionPane.YES_NO_OPTION);
+                if (response == JOptionPane.YES_OPTION) {
+                    startNewGame();
+                } else {
+                    System.exit(0);
+                }
+            }
+
+            attemptsLabel.setText("Attempts left: " + attempts);
+        } catch (NumberFormatException ex) {
+            resultLabel.setText("Please enter a valid number.");
+        }
+    }
+}
+
+
